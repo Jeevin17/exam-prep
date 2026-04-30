@@ -66,8 +66,6 @@ function generatePlan() {
         badge.style.display = 'inline-flex';
         badge.textContent = `✓ Plan active · ${fmtDate(state.startDate)} → ${fmtDate(examDate)} · ${state.dailyHours}h/day`;
     }
-    const editBtn = document.getElementById('edit-plan-btn');
-    if (editBtn) editBtn.style.display = 'block';
     showPage('page-1');
 }
 
@@ -284,23 +282,13 @@ function toggleProblem(subName, index) {
 function showPage(id) {
     if (!id) return;
     const pageId = id.startsWith('#') ? id.slice(1) : id;
-
-    // Explicitly hide ALL pages first
-    document.querySelectorAll('.spa-page').forEach(p => {
-        p.classList.remove('active');
-        p.style.display = 'none';
-    });
-
+    document.querySelectorAll('.spa-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link[data-page]').forEach(l => l.classList.remove('active'));
     const target = document.getElementById(pageId);
     if (target) {
         target.classList.add('active');
-        target.style.display = 'block'; // Force display
-
-        // Handle nav links
-        document.querySelectorAll('.nav-link[data-page]').forEach(l => l.classList.remove('active'));
         const link = document.querySelector(`.nav-link[data-page="${pageId}"]`);
         if (link) link.classList.add('active');
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
         if (window.location.hash !== '#' + pageId) history.pushState({ page: pageId }, '', '#' + pageId);
     }

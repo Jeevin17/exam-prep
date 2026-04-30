@@ -38,87 +38,81 @@ function renderPomoWidget(containerId) {
     if (!container) return;
 
     container.innerHTML = `
-        <div class="glass-card" id="pomo-instance-${containerId}" style="max-width:480px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.15)">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px">
+        <div class="pomodoro-widget" id="pomo-instance-${containerId}">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px">
                 <div style="text-align:left">
-                    <h3 id="pomo-mode-label-${containerId}" style="font-size:16px; margin:0">MODE: ${POMO_MODES[pomo.mode].label}</h3>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan); letter-spacing:0.1em; text-transform:uppercase; margin-top:4px">Focus Protocol</div>
+                    <h3 id="pomo-mode-label-${containerId}">MODE: ${POMO_MODES[pomo.mode].label}</h3>
+                    <div class="pomo-sub">Focus Session</div>
                 </div>
-                <div style="display:flex; gap:12px">
-                    <div style="background:rgba(255,255,255,0.05); padding:8px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); text-align:center">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--text-bright)" id="pomo-count-${containerId}">${pomo.sessionsToday}</div>
-                        <div style="font-size:8px; color:var(--muted); text-transform:uppercase">Done</div>
+                <div class="pomo-stat-row" style="padding:8px 12px; gap:20px">
+                    <div class="pomo-stat">
+                        <span class="pomo-stat-val" style="font-size:16px" id="pomo-count-${containerId}">${pomo.sessionsToday}</span>
+                        <span class="pomo-stat-lbl">Sessions</span>
                     </div>
-                    <div style="background:rgba(255,255,255,0.05); padding:8px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); text-align:center">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--cyan)" id="pomo-time-today-${containerId}">${pomo.minsToday}m</div>
-                        <div style="font-size:8px; color:var(--muted); text-transform:uppercase">Total</div>
+                    <div class="pomo-stat">
+                        <span class="pomo-stat-val" style="font-size:16px" id="pomo-time-today-${containerId}">${pomo.minsToday}m</span>
+                        <span class="pomo-stat-lbl">Today</span>
                     </div>
                 </div>
             </div>
 
-            <div class="pomo-ring-wrap" style="margin-bottom:32px">
-                <svg class="pomo-svg" width="220" height="220">
-                    <circle class="pomo-track" cx="110" cy="110" r="100" fill="none" stroke-width="8" stroke="rgba(255,255,255,0.05)"></circle>
-                    <circle class="pomo-progress" id="pomo-ring-${containerId}" cx="110" cy="110" r="100" fill="none" 
-                            stroke="url(#pomo-grad)" stroke-width="8" stroke-dasharray="628.3" 
-                            stroke-dashoffset="${628.3 * (1 - pomo.time / (pomo.isWork ? POMO_MODES[pomo.mode].work : POMO_MODES[pomo.mode].breakTime))}"></circle>
-                    <defs>
-                        <linearGradient id="pomo-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:var(--violet);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:var(--cyan);stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
+            <div class="pomo-ring-wrap">
+                <svg class="pomo-svg" width="200" height="200">
+                    <circle class="pomo-track" cx="100" cy="100" r="90" fill="none" stroke-width="6"></circle>
+                    <circle class="pomo-progress" id="pomo-ring-${containerId}" cx="100" cy="100" r="90" fill="none" 
+                            stroke="var(--cyan)" stroke-width="6" stroke-dasharray="565.48" 
+                            stroke-dashoffset="${565.48 * (1 - pomo.time / (pomo.isWork ? POMO_MODES[pomo.mode].work : POMO_MODES[pomo.mode].breakTime))}"></circle>
                 </svg>
                 <div class="pomo-center">
-                    <div id="pomo-display-${containerId}" style="font-family:'JetBrains Mono',monospace; font-size:48px; font-weight:800; color:var(--text-bright); text-shadow: 0 0 20px rgba(255,255,255,0.2)">
+                    <div id="pomo-display-${containerId}" style="font-family:'JetBrains Mono',monospace; font-size:36px; font-weight:700; color:var(--text-bright)">
                         ${Math.floor(pomo.time / 60)}:${(pomo.time % 60).toString().padStart(2, '0')}
                     </div>
-                    <div id="pomo-session-info-${containerId}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.2em; margin-top:8px">
+                    <div id="pomo-session-info-${containerId}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); text-transform:uppercase; margin-top:4px">
                         ${pomo.isWork ? '🎯 Focus' : '☕ Break'}
                     </div>
                 </div>
             </div>
 
-            <div style="margin-bottom:24px">
-                <input type="text" id="pomo-task-input-${containerId}" placeholder="Enter current focus..." 
+            <div style="margin-bottom:20px">
+                <input type="text" id="pomo-task-input-${containerId}" placeholder="What are you studying?" 
                        value="${state._currentFocusTask || ''}"
                        oninput="state._currentFocusTask = this.value; document.querySelectorAll('[id^=pomo-task-input-]').forEach(i => i.value = this.value)"
-                       style="width:100%; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:var(--text-bright); padding:12px 16px; border-radius:12px; text-align:center; font-family:'Inter',sans-serif; font-size:14px">
+                       style="width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:var(--text-bright); padding:10px 14px; border-radius:var(--radius-sm); text-align:center">
             </div>
 
-            <div class="radial-setter-container" style="gap:40px; margin-bottom:32px">
+            <div class="radial-setter-container">
                 <div class="radial-setter" id="radial-work-${containerId}">
                     ${renderRadialSVG('work', pomo.customMins, 120, 'var(--violet)')}
                     <div class="radial-center">
                         <div class="radial-val" id="radial-val-work-${containerId}">${pomo.customMins}</div>
-                        <div class="radial-label">Work</div>
+                        <div class="radial-label">Study</div>
                     </div>
                 </div>
                 <div class="radial-setter" id="radial-break-${containerId}">
                     ${renderRadialSVG('break', pomo.customBreakMins, 60, 'var(--emerald)')}
                     <div class="radial-center">
                         <div class="radial-val" id="radial-val-break-${containerId}">${pomo.customBreakMins}</div>
-                        <div class="radial-label">Rest</div>
+                        <div class="radial-label">Break</div>
                     </div>
                 </div>
             </div>
             
-            <button class="pomo-btn primary" style="width:100%; margin-bottom:32px; height:48px; font-size:12px" onclick="pomoApplyCustom()">Initialize Custom Session</button>
+            <button class="pomo-btn primary" style="width:100%; margin-bottom:24px" onclick="pomoApplyCustom()">Set Custom Duration</button>
 
-            <div class="pomo-controls" style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:12px; margin-bottom:24px">
-                <button class="pomo-btn btn-start" onclick="pomoAction('start')" style="height:48px">${pomo.isRunning ? 'Running' : 'Start Focus'}</button>
-                <button class="pomo-btn btn-pause" onclick="pomoAction('pause')" style="height:48px">${pomo.isRunning ? 'Pause' : 'Resume'}</button>
-                <button class="pomo-btn btn-reset" onclick="pomoAction('reset')" style="height:48px">Reset</button>
+            <div class="pomo-controls">
+                <button class="pomo-btn primary" onclick="pomoAction('start')">${pomo.isRunning ? 'Running' : 'Start Focus'}</button>
+                <button class="pomo-btn" onclick="pomoAction('pause')">${pomo.isRunning ? 'Pause' : 'Resume'}</button>
+                <button class="pomo-btn" onclick="pomoAction('reset')">Reset</button>
             </div>
 
-            <div class="pomo-mode-row" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px">
-                <button class="pomo-btn ${pomo.mode === '25/5' ? 'active-mode' : ''}" onclick="pomoSetMode('25/5')">25 / 5</button>
-                <button class="pomo-btn ${pomo.mode === '50/10' ? 'active-mode' : ''}" onclick="pomoSetMode('50/10')">50 / 10</button>
+            <div class="pomo-mode-row" style="margin-top:16px">
+                <button class="pomo-btn ${pomo.mode === '25/5' ? 'active-mode' : ''}" onclick="pomoSetMode('25/5')">25/5</button>
+                <button class="pomo-btn ${pomo.mode === '50/10' ? 'active-mode' : ''}" onclick="pomoSetMode('50/10')">50/10</button>
                 <button class="pomo-btn ${pomo.mode === 'custom' ? 'active-mode' : ''}" onclick="pomoSetMode('custom')">Custom</button>
             </div>
             
-            <div id="pomo-progress-stats-${containerId}" style="margin-top:32px"></div>
-            <div class="pomo-session-log" id="pomo-session-log-${containerId}" style="margin-top:20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:20px"></div>
+            <div id="pomo-progress-stats-${containerId}" style="margin-top:24px; text-align:left"></div>
+            <div class="pomo-session-log" id="pomo-session-log-${containerId}"></div>
         </div>
     `;
 
@@ -249,7 +243,7 @@ function pomoUpdateDisplay() {
     if (globalTime) globalTime.textContent = timeStr;
 
     const total = pomo.isWork ? POMO_MODES[pomo.mode].work : POMO_MODES[pomo.mode].breakTime;
-    const offset = 628.3 * (1 - pomo.time / total); // Correct for r=100
+    const offset = 565.48 * (1 - pomo.time / total);
 
     document.querySelectorAll('[id^="pomo-ring-"]').forEach(el => el.style.strokeDashoffset = offset);
 
@@ -259,7 +253,7 @@ function pomoUpdateDisplay() {
     const bubble = document.getElementById('global-pomo-bar');
     const pauseBtn = document.getElementById('global-pomo-pause-btn');
     if (bubble) {
-        bubble.classList.add('visible'); // Always visible as requested
+        if (pomo.isRunning || (pomo.interval !== null)) bubble.classList.add('visible');
     }
     if (pauseBtn) {
         pauseBtn.textContent = pomo.isRunning ? '⏸' : '▶';
@@ -421,9 +415,3 @@ function renderPomoLog(containerId) {
             </div>
         </div>`).join('');
 }
-
-window.renderPomoWidget = renderPomoWidget;
-window.pomoAction = pomoAction;
-window.pomoSetMode = pomoSetMode;
-window.pomoApplyCustom = pomoApplyCustom;
-window.deletePomoLog = deletePomoLog;

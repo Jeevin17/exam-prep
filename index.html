@@ -9,16 +9,6 @@
 </head>
 
 <body>
-    <div id="global-pomo-bar" class="global-pomo-bar">
-        <div class="global-pomo-inner">
-            <span class="pomo-dot" style="animation: pulse 2s infinite"></span>
-            <span id="global-pomo-time">00:00</span>
-            <button onclick="showPage('page-3')" class="pomo-mini-btn" title="View Timer">◱</button>
-            <button id="global-pomo-pause-btn" onclick="pomoAction('pause')" class="pomo-mini-btn stop"
-                title="Pause/Resume">⏸</button>
-        </div>
-    </div>
-    </div>
     <div id="scroll-progress"></div>
     <div id="back-top">↑</div>
 
@@ -67,24 +57,16 @@
                 <label>Topic Priority (Drag to reorder)</label>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px">
                     <button class="btn-sort-hard" onclick="sortTopicsBy('complexity')">By Complexity</button>
-                    <button class="btn-sort-hard" onclick="sortTopicsBy('difficulty')"
-                        style="color:var(--amber);border-color:var(--amber-glow)">By Difficulty</button>
                     <button class="btn-sort-hard" onclick="sortTopicsBy('traps')"
                         style="color:var(--rose);border-color:var(--rose-glow)">By Risk (Traps)</button>
                     <button class="btn-sort-hard" onclick="sortTopicsBy('hours')"
                         style="color:var(--cyan);border-color:var(--cyan-glow)">By Depth (Hrs)</button>
+                    <button class="btn-sort-hard" onclick="sortHardFirst()">Manual Curated</button>
                 </div>
-                <button class="btn-sort-hard" onclick="sortTopicsBy('default')" style="margin-bottom:8px">Hardest First
-                    (Smart)</button>
                 <ul id="ol-topic-sort-list" class="sortable-list"></ul>
             </div>
 
-            <div style="display:flex; gap:12px; margin-top:24px">
-                <button class="btn-generate" onclick="commitSetup()" style="margin-top:0; flex:2">Finalize & Generate
-                    Plan</button>
-                <button id="ol-cancel-btn" class="pomo-btn" onclick="closeEditPlan()"
-                    style="display:none; flex:1">Cancel</button>
-            </div>
+            <button class="btn-generate" onclick="commitSetup()">Finalize & Generate Plan</button>
             <p class="setup-note">You can edit these later via the "Edit Plan" button.</p>
         </div>
     </div>
@@ -113,6 +95,14 @@
                         <div class="stat">
                             <span class="stat-num" id="stat-total-hrs">1200h</span>
                             <span class="stat-label">Total Study</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num" id="stat-theory-mo">4.0</span>
+                            <span class="stat-label">Theory Mo.</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num" id="stat-problem-mo">3.0</span>
+                            <span class="stat-label">Problem Mo.</span>
                         </div>
                         <div class="stat">
                             <span class="stat-num" id="stat-daily-avg">6.0h</span>
@@ -217,19 +207,62 @@
                 </div>
             </header>
 
-            <section class="section">
-                <div id="pomo-page-container" style="max-width:500px; margin: 0 auto"></div>
-            </section>
+            <div class="pomodoro-widget" style="max-width:500px; margin: 40px auto">
+                <h3>Focus Timer</h3>
+                <div id="pomo-mode-label" class="pomo-sub">MODE: 25 / 5</div>
+
+                <div class="pomo-ring-wrap">
+                    <svg class="pomo-svg" width="220" height="220">
+                        <circle class="pomo-track" cx="110" cy="110" r="100" fill="none" stroke-width="8" />
+                        <circle id="pomo-progress-ring" class="pomo-progress" cx="110" cy="110" r="100" fill="none"
+                            stroke-width="8" stroke="var(--violet)" stroke-dasharray="628" stroke-dashoffset="0" />
+                    </svg>
+                    <div class="pomo-center">
+                        <div id="pomo-display">25:00</div>
+                        <div id="pomo-session-info">🎯 Focus</div>
+                    </div>
+                </div>
+
+                <div class="pomo-mode-row">
+                    <button class="pomo-btn" onclick="pomoSetMode('25/5')">25/5</button>
+                    <button class="pomo-btn" onclick="pomoSetMode('50/10')">50/10</button>
+                    <div style="display:flex; gap:4px">
+                        <input type="number" id="custom-pomo-min" placeholder="Min"
+                            style="width:60px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:white; padding:4px 8px; border-radius:4px; font-family:inherit">
+                        <button class="pomo-btn" onclick="pomoSetCustom()">Set</button>
+                    </div>
+                </div>
+
+                <div class="pomo-controls">
+                    <button class="pomo-btn primary" onclick="pomoAction('start')">Start</button>
+                    <button class="pomo-btn" onclick="pomoAction('pause')">Pause</button>
+                    <button class="pomo-btn" onclick="pomoAction('reset')">Reset</button>
+                </div>
+
+                <input type="text" id="pomo-task-input" placeholder="What are you working on?">
+
+                <div class="pomo-stat-row">
+                    <div class="pomo-stat">
+                        <div id="pomo-count" class="pomo-stat-val">0</div>
+                        <div class="pomo-stat-lbl">Sessions</div>
+                    </div>
+                    <div class="pomo-stat">
+                        <div id="pomo-time-today" class="pomo-stat-val">0 min</div>
+                        <div class="pomo-stat-lbl">Focus Time</div>
+                    </div>
+                    <div class="pomo-stat">
+                        <div class="pomo-stat-val">100%</div>
+                        <div class="pomo-stat-lbl">Goal</div>
+                    </div>
+                </div>
+
+                <div id="pomo-session-log" class="pomo-session-log"></div>
+            </div>
         </div>
 
         <!-- PAGE TOPIC: DETAILED VIEW -->
         <div id="page-topic" class="spa-page">
             <div id="page-topic-content"></div>
-        </div>
-
-        <!-- PAGE SUBTOPIC: DEEP VIEW -->
-        <div id="page-subtopic" class="spa-page">
-            <div id="page-subtopic-content"></div>
         </div>
     </main>
 
@@ -260,6 +293,7 @@
 
             setDefaultOverlayDates();
             buildSortableList();
+            buildOverlaySortableList();
 
             if (hasSaved) {
                 const overlay = document.getElementById('first-load-overlay');
@@ -277,8 +311,8 @@
             showPage(['page-1', 'page-2', 'page-3'].includes(hash) ? hash : 'page-1');
 
             pomoResetDailyIfNeeded();
-            renderPomoWidget('pomo-page-container');
             pomoUpdateDisplay();
+            renderPomoLog();
         })();
 
         // Scroll progress & Back to top
