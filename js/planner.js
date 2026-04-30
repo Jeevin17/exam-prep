@@ -163,13 +163,15 @@ function showTopic(id) {
     if (!container) return;
     let html = `
         <header class="hero"><div class="hero-inner">
-            <button onclick="showPage('page-2')" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-family:'JetBrains Mono',monospace;margin-bottom:20px">← BACK TO SYLLABUS</button>
-            <div class="hero-label">${topic.name}</div>
+            <button onclick="showPage('page-2')" style="background:none;border:none;color:var(--cyan);cursor:pointer;font-family:'JetBrains Mono',monospace;margin-bottom:20px; display:flex; align-items:center; gap:8px; font-size:11px">
+                <span style="font-size:18px">←</span> BACK TO SYLLABUS
+            </button>
+            <div class="hero-label">${topic.name} Explorer</div>
             <h1 class="page-title">${topic.name}</h1>
-            <p class="page-sub">Comprehensive breakdown of all modules and expected study schedule.</p>
+            <p class="page-sub">Comprehensive module-level breakdown with key concept summaries.</p>
         </div></header>
-        <section class="section">
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 450px), 1fr)); gap:24px">
+        <section class="section" style="padding: 0 16px 80px">
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap:16px">
     `;
     Object.entries(subtopics).forEach(([subName, subData]) => {
         const dm = getDifficultyMeta(subData.difficulty_score || 5);
@@ -177,26 +179,26 @@ function showTopic(id) {
         const doneCount = probs.filter(p => p.done).length;
         const totalCount = (subData.applications?.length || 0) + (subData.components?.length || 0) || 5;
         html += `
-            <div class="glass-card" onclick="showSubtopic('${subName.replace(/'/g, "\\'")}')" style="cursor:pointer">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px">
-                    <div style="text-align:left">
-                        <div class="phase-num" style="font-size:10px">${fmtDate(subData.date)}</div>
-                        <div class="phase-name" style="font-size:16px; margin:4px 0">${subName}</div>
+            <div class="glass-card" onclick="showSubtopic('${subName.replace(/'/g, "\\'")}')" style="cursor:pointer; display:flex; flex-direction:column; padding:24px; min-height:240px">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px">
+                    <div class="phase-num" style="font-size:10px; color:var(--cyan)">${fmtDate(subData.date)}</div>
+                    <span class="diff-badge-s" style="background:${dm.bg};color:${dm.color}; font-size:9px; padding:2px 8px; border-radius:10px">${dm.label}</span>
+                </div>
+                <h3 style="font-size:16px; margin:0 0 12px 0; color:var(--text-bright); line-height:1.3">${subName}</h3>
+                <div style="font-size:12.5px; color:var(--text); line-height:1.5; margin-bottom:20px; text-align:left; flex:1; opacity:0.8">
+                    ${subData.concept || 'No summary available for this module.'}
+                </div>
+                <div style="margin-top:auto">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px">
+                        <div class="bar-track" style="flex:1; height:4px; background:rgba(255,255,255,0.05)">
+                            <div class="bar-fill" style="width:${(subData.difficulty_score || 5) * 10}%; background:${dm.color}"></div>
+                        </div>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted)">${(subData.difficulty_score || 5).toFixed(1)}</span>
                     </div>
-                    <span class="diff-badge-s" style="background:${dm.bg};color:${dm.color}">${dm.label}</span>
-                </div>
-                <div style="font-size:12px; color:var(--muted); font-style:italic; margin-bottom:16px; text-align:left; min-height:3em">
-                    ${subData.concept || ''}
-                </div>
-                <div style="display:flex; align-items:center; gap:12px; margin-top:auto">
-                    <div class="bar-track" style="flex:1; height:6px; background:rgba(255,255,255,0.05)">
-                        <div class="bar-fill" style="width:${(subData.difficulty_score || 5) * 10}%; background:${dm.color}"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--cyan)">${subData.study_hours_int || 2}h Session</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted)">${doneCount}/${totalCount} TASKS</span>
                     </div>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted)">${(subData.difficulty_score || 5).toFixed(1)}/10</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--cyan)">${subData.study_hours_int || 2}h Session</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted)">${doneCount}/${totalCount} Tasks Done</span>
                 </div>
             </div>
         `;
@@ -236,7 +238,7 @@ function showSubtopic(subName) {
                     <div class="section-tag" style="text-align:center">Active Session</div>
                     <div id="subtopic-pomo-widget"></div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px">
+                <div class="responsive-grid-2" style="gap:30px">
                     <div class="glass-card" style="text-align:left">
                         <div class="section-tag">Key Theory</div>
                         <label class="config-note" style="color:var(--cyan)">FORMULA</label>

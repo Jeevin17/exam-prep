@@ -2076,8 +2076,59 @@ ul.clean-list li:last-child {
 }
 
 /* ══════════════════════════════════════════
-   MOBILE RESPONSIVE
+   MOBILE RESPONSIVE OVERHAUL
 ══════════════════════════════════════════ */
+
+/* Helper for grid layouts in JS */
+.responsive-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+@media(max-width:850px) {
+    .nav {
+        top: auto;
+        bottom: 0;
+        border-top: 1px solid var(--glass-border);
+        border-bottom: none;
+        padding: 8px 0 12px;
+        background: rgba(5, 7, 10, 0.85);
+        justify-content: space-around;
+        gap: 0;
+    }
+    
+    .nav div[style*="absolute"] {
+        display: none !important; /* Hide logo on mobile nav */
+    }
+
+    .nav-link {
+        font-size: 10px;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .container {
+        padding: 24px 16px 100px; /* Extra bottom padding for nav */
+    }
+
+    .responsive-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        font-size: clamp(28px, 8vw, 42px);
+    }
+}
 
 @media(max-width:768px) {
     .phase-header {
@@ -2114,7 +2165,8 @@ ul.clean-list li:last-child {
 
     .page-footer {
         flex-direction: column;
-        gap: 10px
+        gap: 10px;
+        padding-bottom: 120px; /* Space for mobile nav */
     }
 
     .footer-nav a {
@@ -2123,7 +2175,11 @@ ul.clean-list li:last-child {
     }
 
     .stats-row {
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr))
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat {
+        padding: 16px;
     }
 }
 
@@ -2133,7 +2189,7 @@ ul.clean-list li:last-child {
     }
 
     .container {
-        padding: 28px 14px
+        padding: 24px 12px 100px;
     }
 
     .phase-block,
@@ -2146,8 +2202,19 @@ ul.clean-list li:last-child {
         width: 180px;
         height: 180px
     }
+    
+    .btn-grid {
+        grid-template-columns: 1fr;
+    }
 
     #pomo-time {
+        font-size: 28px;
+    }
+    
+    .hero-label {
+        font-size: 9px;
+    }
+}
         font-size: 28px
     }
 

@@ -66,27 +66,33 @@
 
             <div class="setup-field">
                 <label>Topic Priority (Drag to reorder)</label>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px">
+                <div class="btn-grid" style="margin-bottom:8px">
                     <button class="btn-sort-hard" onclick="sortTopicsBy('complexity')">By Complexity</button>
                     <button class="btn-sort-hard" onclick="sortTopicsBy('traps')"
                         style="color:var(--rose);border-color:var(--rose-glow)">By Risk (Traps)</button>
                     <button class="btn-sort-hard" onclick="sortTopicsBy('hours')"
                         style="color:var(--cyan);border-color:var(--cyan-glow)">By Depth (Hrs)</button>
-                    <button class="btn-sort-hard" onclick="sortHardFirst()">Manual Curated</button>
+                    <button class="btn-sort-hard" onclick="sortHardFirst()">By hard</button>
                 </div>
                 <ul id="ol-topic-sort-list" class="sortable-list"></ul>
             </div>
 
             <div style="display:flex; gap:12px; margin-top:24px">
-                <button class="btn-generate" onclick="commitSetup()" style="margin-top:0; flex:2">Finalize & Generate Plan</button>
-                <button id="ol-cancel-btn" class="pomo-btn" onclick="closeEditPlan()" style="display:none; flex:1">Cancel</button>
+                <button class="btn-generate" onclick="commitSetup()" style="margin-top:0; flex:2">Finalize & Generate
+                    Plan</button>
+                <button id="ol-cancel-btn" class="pomo-btn" onclick="closeEditPlan()"
+                    style="display:none; flex:1">Cancel</button>
             </div>
             <p class="setup-note">You can edit these later via the "Edit Plan" button.</p>
         </div>
     </div>
 
     <nav class="nav">
-        <div style="position: absolute; left: 30px; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-bright); letter-spacing: 1px; font-size: 14px">PHYSICS <span class="grad" style="font-size: 10px; vertical-align: middle; margin-left: 5px; font-family: 'JetBrains Mono', monospace">PREP</span></div>
+        <div
+            style="position: absolute; left: 30px; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-bright); letter-spacing: 1px; font-size: 14px">
+            PHYSICS <span class="grad"
+                style="font-size: 10px; vertical-align: middle; margin-left: 5px; font-family: 'JetBrains Mono', monospace">PREP</span>
+        </div>
         <a href="#page-1" class="nav-link" data-page="page-1" onclick="showPage('page-1')">TIMELINE</a>
         <a href="#page-2" class="nav-link" data-page="page-2" onclick="showPage('page-2')">SYLLABUS</a>
         <a href="#page-3" class="nav-link" data-page="page-3" onclick="showPage('page-3')">POMODORO</a>
@@ -107,14 +113,6 @@
                         <div class="stat">
                             <span class="stat-num" id="stat-total-hrs">1200h</span>
                             <span class="stat-label">Total Study</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-num" id="stat-theory-mo">4.0</span>
-                            <span class="stat-label">Theory Mo.</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-num" id="stat-problem-mo">3.0</span>
-                            <span class="stat-label">Problem Mo.</span>
                         </div>
                         <div class="stat">
                             <span class="stat-num" id="stat-daily-avg">6.0h</span>

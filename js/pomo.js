@@ -170,14 +170,15 @@ function initRadialEvents(containerId, type, max) {
     setter.addEventListener('mousedown', (e) => {
         window._currentDraggingType = type;
         window._currentDraggingMax = max;
+        window._currentDraggingElement = setter; // Store the specific element
         window._isDraggingRadial = true;
-        // Trigger initial update
         window._radialUpdateFunc(e);
     });
 
     setter.addEventListener('touchstart', (e) => {
         window._currentDraggingType = type;
         window._currentDraggingMax = max;
+        window._currentDraggingElement = setter; // Store the specific element
         window._isDraggingRadial = true;
         window._radialUpdateFunc(e);
         e.preventDefault();
@@ -187,16 +188,11 @@ function initRadialEvents(containerId, type, max) {
 // Global radial event handler (singleton)
 if (!window._radialHandlerInit) {
     window._radialUpdateFunc = (e) => {
-        if (!window._isDraggingRadial) return;
+        if (!window._isDraggingRadial || !window._currentDraggingElement) return;
         
-        // Find the active setter for coordinate calculation
-        // We can use the event target or find by type if we assume one active view
         const type = window._currentDraggingType;
         const max = window._currentDraggingMax;
-        
-        // We need a reference to one of the setters of this type
-        const setter = document.querySelector(`[id^="radial-${type}-"]`);
-        if (!setter) return;
+        const setter = window._currentDraggingElement;
 
         const rect = setter.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -205,10 +201,16 @@ if (!window._radialHandlerInit) {
         const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
 
         let angle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
-        angle += 90;
+        angle += 90; // Align 0 degrees with top (12 o'clock)
         if (angle < 0) angle += 360;
 
+        // Map 0-360 range to 0-60 minutes
         let mins = Math.round((angle / 360) * max);
+        
+        // Ensure strictly positive minutes and cap at max (60)
+        // If mins is 0 (at very top), it usually means 60 or 1 depending on intent.
+        // For a clock-like selector, 0 usually maps to the max value (60 mins).
+        if (mins === 0) mins = max; 
         mins = Math.max(1, Math.min(max, mins));
 
         if (type === 'work') pomo.customMins = mins;
@@ -266,7 +268,7 @@ function renderProgressStats(containerId) {
             <div class="bar-track" style="margin-bottom:12px">
                 <div class="bar-fill" style="width:${progress}%; background:${topic.color}"></div>
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+            <div class="responsive-grid-2" style="gap:12px">
                 <div>
                     <div style="font-size:18px; font-weight:700; color:var(--text-bright)">${doneHrs.toFixed(1)}h</div>
                     <div style="font-size:8px; color:var(--muted); text-transform:uppercase">Completed</div>

@@ -151,37 +151,6 @@ function extractSubtopicMetadata(obj, prefix = '', acc = [], ctx = { hrs: 0 }) {
     return acc;
 }
 
-window.toggleSubtopicList = function(tid) {
-    const list = document.getElementById(`sublist-${tid}`);
-    if (list) list.style.display = list.style.display === 'none' ? 'flex' : 'none';
-};
-
-window.showSubtopicFromSyllabus = function(tid, subName) {
-    state._currentTopic = tid;
-    const mapping = {
-        math: 'mathematical_methods', cm: 'classical_mechanics', em: 'electromagnetism',
-        qm: 'quantum_mechanics', sm: 'thermodynamics_and_statistical_physics',
-        mp: 'modern_physics', ss: 'solid_state_physics', elec: 'electronics'
-    };
-    const topicDates = state.topicPlan ? state.topicPlan[tid] : { start: new Date() };
-    const dataSection = state.fullData?.IIT_JAM_Physics?.[mapping[tid]];
-    let cumulativeHrs = 0;
-    function extract(obj, prefix = '') {
-        let subs = {};
-        if (!obj || typeof obj !== 'object') return subs;
-        if (obj.concept || obj.study_hours_int !== undefined) {
-            const name = prefix.replace(/_/g, ' ').toUpperCase() || 'GENERAL';
-            subs[name] = { ...obj, date: addDays(topicDates.start, Math.floor(cumulativeHrs / (state.dailyHours || 6))) };
-            cumulativeHrs += (obj.study_hours_int || 0);
-            return subs;
-        }
-        for (const [key, value] of Object.entries(obj)) Object.assign(subs, extract(value, prefix ? `${prefix} > ${key}` : key));
-        return subs;
-    }
-    state._activeSubtopics = extract(dataSection);
-    showSubtopic(subName);
-};
-
 function renderDynamicStats(phases) {
     const update = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     update('stat-total-hrs', phases.totalHours + 'h');
