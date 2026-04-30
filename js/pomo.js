@@ -82,7 +82,7 @@ function renderPomoWidget(containerId) {
 
             <div class="radial-setter-container">
                 <div class="radial-setter" id="radial-work-${containerId}">
-                    ${renderRadialSVG('work', pomo.customMins, 120, 'var(--violet)')}
+                    ${renderRadialSVG('work', pomo.customMins, 60, 'var(--violet)')}
                     <div class="radial-center">
                         <div class="radial-val" id="radial-val-work-${containerId}">${pomo.customMins}</div>
                         <div class="radial-label">Study</div>
@@ -116,7 +116,7 @@ function renderPomoWidget(containerId) {
         </div>
     `;
 
-    initRadialEvents(containerId, 'work', 120);
+    initRadialEvents(containerId, 'work', 60);
     initRadialEvents(containerId, 'break', 60);
     renderPomoLog(containerId);
     renderProgressStats(containerId);
@@ -128,14 +128,36 @@ function renderRadialSVG(type, val, max, color) {
     const offset = circ - (val / max) * circ;
     const angle = (val / max) * 360;
 
+    // Generate clock ticks
+    let ticks = '';
+    for (let i = 0; i < 60; i += 5) {
+        const tickAngle = (i / 60) * 360 - 90;
+        const x1 = 70 + 58 * Math.cos(tickAngle * Math.PI / 180);
+        const y1 = 70 + 58 * Math.sin(tickAngle * Math.PI / 180);
+        const x2 = 70 + (i % 15 === 0 ? 50 : 54) * Math.cos(tickAngle * Math.PI / 180);
+        const y2 = 70 + (i % 15 === 0 ? 50 : 54) * Math.sin(tickAngle * Math.PI / 180);
+        ticks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(255,255,255,0.15)" stroke-width="${i % 15 === 0 ? 2 : 1}" />`;
+    }
+
     return `
         <svg class="radial-svg" width="140" height="140" viewBox="0 0 140 140">
-            <circle class="radial-track" cx="70" cy="70" r="${r}" fill="none" stroke-width="8"></circle>
+            <defs>
+                <filter id="glow-${type}">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <circle class="radial-track" cx="70" cy="70" r="${r}" fill="none" stroke-width="6" stroke="rgba(255,255,255,0.03)"></circle>
+            ${ticks}
             <circle class="radial-progress" id="radial-prog-${type}" cx="70" cy="70" r="${r}" fill="none" 
-                    stroke="${color}" stroke-width="8" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
-                    transform="rotate(-90 70 70)"></circle>
+                    stroke="${color}" stroke-width="6" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+                    stroke-linecap="round" transform="rotate(-90 70 70)" filter="url(#glow-${type})"></circle>
             <g id="radial-handle-group-${type}" transform="rotate(${angle - 90} 70 70)">
-                <circle class="radial-handle" cx="${70 + r}" cy="70" r="10"></circle>
+                <circle class="radial-handle" cx="${70 + r}" cy="70" r="10" fill="#fff" stroke="rgba(255,255,255,0.2)" stroke-width="2"></circle>
+                <circle cx="${70 + r}" cy="70" r="4" fill="${color}"></circle>
             </g>
         </svg>
     `;
@@ -145,21 +167,47 @@ function initRadialEvents(containerId, type, max) {
     const setter = document.querySelector(`#pomo-instance-${containerId} #radial-${type}-${containerId}`);
     if (!setter) return;
 
-    let isDragging = false;
+    setter.addEventListener('mousedown', (e) => {
+        window._currentDraggingType = type;
+        window._currentDraggingMax = max;
+        window._isDraggingRadial = true;
+        // Trigger initial update
+        window._radialUpdateFunc(e);
+    });
 
-    const update = (e) => {
-        if (!isDragging) return;
+    setter.addEventListener('touchstart', (e) => {
+        window._currentDraggingType = type;
+        window._currentDraggingMax = max;
+        window._isDraggingRadial = true;
+        window._radialUpdateFunc(e);
+        e.preventDefault();
+    }, { passive: false });
+}
+
+// Global radial event handler (singleton)
+if (!window._radialHandlerInit) {
+    window._radialUpdateFunc = (e) => {
+        if (!window._isDraggingRadial) return;
+        
+        // Find the active setter for coordinate calculation
+        // We can use the event target or find by type if we assume one active view
+        const type = window._currentDraggingType;
+        const max = window._currentDraggingMax;
+        
+        // We need a reference to one of the setters of this type
+        const setter = document.querySelector(`[id^="radial-${type}-"]`);
+        if (!setter) return;
+
         const rect = setter.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+        const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
 
         let angle = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI;
         angle += 90;
         if (angle < 0) angle += 360;
 
-        // Snap to steps of 1 min
         let mins = Math.round((angle / 360) * max);
         mins = Math.max(1, Math.min(max, mins));
 
@@ -169,12 +217,11 @@ function initRadialEvents(containerId, type, max) {
         updateRadialUI(type, mins, max);
     };
 
-    setter.addEventListener('mousedown', (e) => { isDragging = true; update(e); });
-    setter.addEventListener('touchstart', (e) => { isDragging = true; update(e); e.preventDefault(); });
-    window.addEventListener('mousemove', update);
-    window.addEventListener('touchmove', update);
-    window.addEventListener('mouseup', () => isDragging = false);
-    window.addEventListener('touchend', () => isDragging = false);
+    window.addEventListener('mousemove', window._radialUpdateFunc);
+    window.addEventListener('touchmove', window._radialUpdateFunc, { passive: false });
+    window.addEventListener('mouseup', () => { window._isDraggingRadial = false; });
+    window.addEventListener('touchend', () => { window._isDraggingRadial = false; });
+    window._radialHandlerInit = true;
 }
 
 function updateRadialUI(type, mins, max) {
@@ -243,7 +290,7 @@ function pomoUpdateDisplay() {
     if (globalTime) globalTime.textContent = timeStr;
 
     const total = pomo.isWork ? POMO_MODES[pomo.mode].work : POMO_MODES[pomo.mode].breakTime;
-    const offset = 565.48 * (1 - pomo.time / total);
+    const offset = 565.48 * (1 - pomo.time / total); 
 
     document.querySelectorAll('[id^="pomo-ring-"]').forEach(el => el.style.strokeDashoffset = offset);
 
@@ -253,7 +300,11 @@ function pomoUpdateDisplay() {
     const bubble = document.getElementById('global-pomo-bar');
     const pauseBtn = document.getElementById('global-pomo-pause-btn');
     if (bubble) {
-        if (pomo.isRunning || (pomo.interval !== null)) bubble.classList.add('visible');
+        if (pomo.isRunning || (pomo.interval !== null)) {
+             bubble.classList.add('visible');
+        } else {
+             bubble.classList.remove('visible');
+        }
     }
     if (pauseBtn) {
         pauseBtn.textContent = pomo.isRunning ? '⏸' : '▶';
