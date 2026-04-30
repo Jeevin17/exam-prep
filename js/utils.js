@@ -109,26 +109,9 @@ function renderSyllabus() {
         const displayHrs = metrics.totalHours || topic.hrs;
         const displayDiff = metrics.avgDifficulty || topic.difficulty || 5;
         const dm = getDifficultyMeta(displayDiff);
-        const subtopics = state.fullData?.IIT_JAM_Physics?.[mapping[tid]];
-        let subtopicListHtml = '';
-        if (subtopics) {
-            const list = extractSubtopicMetadata(subtopics);
-            subtopicListHtml = `<div class="subtopic-list" style="margin-top:16px; display:none" id="sublist-${tid}">
-                ${list.map(s => `
-                    <div class="subtopic-item-row" onclick="event.stopPropagation(); showSubtopicFromSyllabus('${tid}', '${s.name.replace(/'/g, "\\'")}')">
-                        <div style="text-align:left">
-                            <div class="sub-item-date">${fmtDate(addDays(dates?.start || new Date(), s.offset))}</div>
-                            <div class="sub-item-name">${s.name}</div>
-                        </div>
-                        <div class="subtopic-item-meta">
-                            <span class="sub-item-probs">${s.hours}h</span>
-                            <span class="sub-item-arrow">→</span>
-                        </div>
-                    </div>`).join('')}
-            </div>`;
-        }
+        
         return `
-            <div class="topic-header ${topic.badge}" id="topic-card-${tid}" onclick="toggleSubtopicList('${tid}')"
+            <div class="topic-header ${topic.badge}" id="topic-card-${tid}" onclick="showTopic('${tid}')"
                  style="cursor:pointer;border-left:3px solid ${topic.color}; margin-bottom:12px; padding: 20px">
                 <div style="display:flex; justify-content:space-between; align-items:center; width: 100%">
                     <div style="flex:1">
@@ -141,12 +124,14 @@ function renderSyllabus() {
                             ${dates ? `<span>· ${fmtDate(dates.start)} – ${fmtDate(dates.end)}</span>` : ''}
                         </div>
                     </div>
-                    <div style="text-align:right">
-                        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${progress}%</div>
-                        <div class="bar-track" style="width:60px; height:4px; margin-top:4px"><div class="bar-fill" style="width:${progress}%;background:${topic.color}"></div></div>
+                    <div style="display:flex; align-items:center; gap:20px">
+                        <div style="text-align:right">
+                            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">${progress}%</div>
+                            <div class="bar-track" style="width:60px; height:4px; margin-top:4px"><div class="bar-fill" style="width:${progress}%;background:${topic.color}"></div></div>
+                        </div>
+                        <span style="color:var(--muted); font-size:18px">→</span>
                     </div>
                 </div>
-                ${subtopicListHtml}
             </div>`;
     }).join('');
 }
