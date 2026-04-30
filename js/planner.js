@@ -281,19 +281,26 @@ function toggleProblem(subName, index) {
     showSubtopic(subName);
 }
 
-function showPage(id) {
+function showPage(id, skipScroll = false) {
     if (!id) return;
     const pageId = id.startsWith('#') ? id.slice(1) : id;
+    const target = document.getElementById(pageId);
+    if (!target) return;
+
+    const alreadyActive = target.classList.contains('active');
+
     document.querySelectorAll('.spa-page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-link[data-page]').forEach(l => l.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) {
-        target.classList.add('active');
-        const link = document.querySelector(`.nav-link[data-page="${pageId}"]`);
-        if (link) link.classList.add('active');
+    
+    target.classList.add('active');
+    const link = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+    if (link) link.classList.add('active');
+    
+    if (!alreadyActive && !skipScroll) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        if (window.location.hash !== '#' + pageId) history.pushState({ page: pageId }, '', '#' + pageId);
     }
+    
+    if (window.location.hash !== '#' + pageId) history.pushState({ page: pageId }, '', '#' + pageId);
 }
 
 function commitSetup() {

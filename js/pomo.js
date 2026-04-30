@@ -56,8 +56,8 @@ function renderPomoWidget(containerId) {
                 </div>
             </div>
 
-            <div class="pomo-ring-wrap">
-                <svg class="pomo-svg" width="200" height="200">
+            <div class="pomo-ring-wrap" style="width: 100%; max-width: 200px; aspect-ratio: 1/1; margin: 0 auto 28px">
+                <svg class="pomo-svg" viewBox="0 0 200 200" style="width: 100%; height: 100%; transform: rotate(-90deg)">
                     <circle class="pomo-track" cx="100" cy="100" r="90" fill="none" stroke-width="6"></circle>
                     <circle class="pomo-progress" id="pomo-ring-${containerId}" cx="100" cy="100" r="90" fill="none" 
                             stroke="var(--cyan)" stroke-width="6" stroke-dasharray="565.48" 

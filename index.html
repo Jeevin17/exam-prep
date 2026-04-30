@@ -87,16 +87,16 @@
         </div>
     </div>
 
-    <nav class="nav">
-        <div
-            style="position: absolute; left: 30px; font-family: 'Playfair Display', serif; font-weight: 700; color: var(--text-bright); letter-spacing: 1px; font-size: 14px">
-            PHYSICS <span class="grad"
-                style="font-size: 10px; vertical-align: middle; margin-left: 5px; font-family: 'JetBrains Mono', monospace">PREP</span>
+    <div class="top-bar">
+        <div class="brand" onclick="showPage('page-1')" style="cursor:pointer">
+            PHYSICS <span class="grad">PREP</span>
         </div>
-        <a href="#page-1" class="nav-link" data-page="page-1" onclick="showPage('page-1')">TIMELINE</a>
-        <a href="#page-2" class="nav-link" data-page="page-2" onclick="showPage('page-2')">SYLLABUS</a>
-        <a href="#page-3" class="nav-link" data-page="page-3" onclick="showPage('page-3')">POMODORO</a>
-    </nav>
+        <nav class="nav">
+            <a href="#page-1" class="nav-link" data-page="page-1" onclick="showPage('page-1')">TIMELINE</a>
+            <a href="#page-2" class="nav-link" data-page="page-2" onclick="showPage('page-2')">SYLLABUS</a>
+            <a href="#page-3" class="nav-link" data-page="page-3" onclick="showPage('page-3')">POMODORO</a>
+        </nav>
+    </div>
 
     <main class="container">
         <!-- PAGE 1: TIMELINE -->
@@ -113,6 +113,14 @@
                         <div class="stat">
                             <span class="stat-num" id="stat-total-hrs">1200h</span>
                             <span class="stat-label">Total Study</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num" id="stat-theory-mo">4.0</span>
+                            <span class="stat-label">Theory Mo.</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-num" id="stat-problem-mo">3.0</span>
+                            <span class="stat-label">Problem Mo.</span>
                         </div>
                         <div class="stat">
                             <span class="stat-num" id="stat-daily-avg">6.0h</span>
@@ -242,9 +250,8 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="js/data-dictionary.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/data-dictionary.js"></script>
     <script src="js/pomo.js"></script>
     <script src="js/planner.js"></script>
     <script>
